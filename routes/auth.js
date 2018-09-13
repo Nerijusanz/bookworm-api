@@ -8,22 +8,16 @@ router.post('/',(req,res) => {
 
     const {credentials} = req.body;
     
-    User.findOne({email:credentials.email}).then(user=>{
+    User.findOne({email:credentials.email}).then(user => {
 
-        if(!user){
+        if(!user || !user.isValidPassword(credentials.password) ){
             res.status(400).json({errors:{global:"Invalid credentials"}});
             return;
         }
         
-        
-        if(!user.isValidPassword(credentials.password)){
-            res.status(400).json({errors:{global:"Invalid credentials"}});
-            return;
-        }
-
+        //credentials OK;
         res.json({user: user.toAuthJSON()});
-        
-            
+         
     })
 
 });
