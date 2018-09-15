@@ -6,6 +6,7 @@ import bodyParser from 'body-parser';
 import Promise from 'bluebird';//overwrite default mongoose promise into bluebird promise
 
 import auth from './routes/auth';
+import users from './routes/users';
 
 dotenv.config();    //INIT .env PARAMS
 
@@ -20,7 +21,7 @@ mongoose.set('useCreateIndex', true);
 
 //Router
 app.use('/api/auth',auth);
-
+app.use('/api/users',users);
 
 app.get('/*',(req,res)=>{
     res.sendFile(path.join(__dirname,'index.html'));
