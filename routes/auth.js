@@ -58,7 +58,7 @@ router.post('/authentication_check',authenticate,(req,res) => {
 
 
 // sigup_user_exists route use : signupform -> email field -> onBlur action, make ajax -> check if such email are in database
-router.post('/signup_user_exists',(req,res) => {
+router.post('/signup_email_exists',(req,res) => {
 
     const email = req.body.email;
 
@@ -71,10 +71,11 @@ router.post('/signup_user_exists',(req,res) => {
 
     User.findOne({email}).then(userEmail => {
 
-        if(userEmail)   //if user email founded on database.   
+        if(userEmail)   //if user email founded on database. 
             return responseErrorEmail(res,`email: ${email} is already taken`);      
  
         // such email don`t exists in db;
+
         res.json({});
 
     });
