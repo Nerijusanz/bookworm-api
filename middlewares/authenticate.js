@@ -41,7 +41,6 @@ export const authenticate = (req,res,next)=>{
                 return responseErrorGlobal(res,Array(`Authorization forbidden`));
 
 
-            //note: password_public maked: bcrypt.hashSync(this.passwordHash,10);
             if(!bcrypt.compareSync(user.passwordHash,decodeJWT.password_public))
                 return responseErrorGlobal(res,Array(`Authorization forbidden`));
 
