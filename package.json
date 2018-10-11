@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon --exec babel-node -- index.js"
+    "start": "nodemon --exec babel-node -- ./index.js"
   },
   "author": "",
   "license": "ISC",
@@ -31,6 +31,7 @@
     "lodash": "^4.17.11",
     "mongoose": "^5.2.14",
     "mongoose-unique-validator": "^2.0.1",
-    "nodemailer": "^4.6.8"
+    "nodemailer": "^4.6.8",
+    "validator": "^10.8.0"
   }
 }
