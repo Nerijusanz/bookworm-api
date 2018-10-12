@@ -2,8 +2,8 @@ import {mailSetup} from '../../config/config';
 
 function textHtmlBody(userObj){
 
-    return `<h2>Bookworm account verify</h2>
-    <a href="${userObj.generateSignupConfirmationUrl()}">click here verify account</a>`;
+    return `<h2>Bookworm user account confirmation </h2>
+    <a href="${userObj.generateSignupConfirmationUrl()}">click here to to confirm account</a>`;
 }
 
 /*function textBody(userObj){

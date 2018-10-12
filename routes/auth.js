@@ -214,7 +214,7 @@ router.post('/forgot_password',(req,res) =>{
     // -----------------validation start-------------
 
     if(!Validator.isEmail(email)) 
-        return responseErrorEmail(res,`Invalid email`); 
+        return responseErrorEmail(res,`email: ${email} is invalid`); 
 
 
     // --------------- validation end-----------------
@@ -222,7 +222,7 @@ router.post('/forgot_password',(req,res) =>{
     User.findOne({email}).then(user=>{
 
         if(!user)
-            return responseErrorEmail(res,`email: ${email} is invalid`); 
+            return responseErrorEmail(res,`email invalid. Make check your email is correct`); 
 
         // User OK;
         // make data updates;
@@ -233,7 +233,7 @@ router.post('/forgot_password',(req,res) =>{
             .then((userEmail)=>{
 
                 if(!userEmail)
-                    return responseErrorGlobal(res,Array(`forgot password invalid`));
+                    return responseErrorGlobal(res,Array(`forgot password send invalid`));
 
                 emailForgotPassword(userEmail); // send email resetPasswordToken link;
 
