@@ -61,20 +61,20 @@ router.post('/logout',(req,res) => {
     const logoutToken = req.body.logoutToken;  // logout token
 
     if(!logoutToken)
-        return responseErrorGlobal(res,Array(`logout invalid 0`));
+        return responseErrorGlobal(res,Array(`logout invalid`));
 
     jwt.verify(logoutToken,process.env.JWT_SECRET,(err,decodeJWT) => {
 
         if(err)
-            return responseErrorGlobal(res,Array(`logout invalid 1`));
+            return responseErrorGlobal(res,Array(`logout invalid`));
 
         User.findOne({loginSessionId:decodeJWT.sess}).then(user=>{
 
             if(!user)
-                return responseErrorGlobal(res,Array(`logout invalid 2`));
+                return responseErrorGlobal(res,Array(`logout invalid`));
 
             if(user._id != decodeJWT.id)
-                return responseErrorGlobal(res,Array(`logout invalid 3`));
+                return responseErrorGlobal(res,Array(`logout invalid`));
             
             user.loginSessionId='';
 
