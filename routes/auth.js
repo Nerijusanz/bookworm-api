@@ -35,13 +35,59 @@ router.post('/login',(req,res) => {
 
         if(!user || !user.confirmed || !user.isValidPassword(password) )
             return responseErrorGlobal(res,Array(`Invalid credentials`));
-        
-        //credentials OK;
-        res.json({user:{
-                    token:user.generateJWTUserToken()
-                }});
-         
+
+            user.setLoginSessionId();
+
+            user.save()
+                .then(user=>{
+
+                    if(!user)
+                        return responseErrorGlobal(res,Array(`login invalid`));
+            
+                    //credentials OK;
+                    res.json({user:{
+                                token:user.generateJWTUserLoginToken(),
+                                logoutToken: user.generateJWTUserLoggedOutToken(),
+                            }});
+                            
+                })
     })
+
+});
+
+
+router.post('/logout',(req,res) => {
+
+    const logoutToken = req.body.logoutToken;  // logout token
+
+    if(!logoutToken)
+        return responseErrorGlobal(res,Array(`logout invalid 0`));
+
+    jwt.verify(logoutToken,process.env.JWT_SECRET,(err,decodeJWT) => {
+
+        if(err)
+            return responseErrorGlobal(res,Array(`logout invalid 1`));
+
+        User.findOne({loginSessionId:decodeJWT.sess}).then(user=>{
+
+            if(!user)
+                return responseErrorGlobal(res,Array(`logout invalid 2`));
+
+            if(user._id != decodeJWT.id)
+                return responseErrorGlobal(res,Array(`logout invalid 3`));
+            
+            user.loginSessionId='';
+
+            user.save() // save updated data, and send email;
+                .then(()=>{
+
+                    res.json({});
+                    
+                });
+
+        });
+
+    });
 
 });
 
@@ -49,9 +95,12 @@ router.post('/login',(req,res) => {
 router.post('/authentication_check',authenticate,(req,res) => {
 
     const token = req.authenticatedToken;  //get authenticatedToken from authenticate middleware
+    const logoutToken = req.authenticatedLogoutToken;
+
 
     res.json({user:{
-        token
+        token,
+        logoutToken
     }});
 
 });
@@ -85,7 +134,7 @@ router.post('/signup_email_exists',(req,res) => {
 
 router.post('/signup',(req,res) => {
 
-    const {email,password} = req.body.user;
+    const {email,password,passwordConf} = req.body.user;
 
     // ------- validation start------
     const validationErrors = Array();
@@ -94,6 +143,7 @@ router.post('/signup',(req,res) => {
     if(!Validator.isEmail(email)) validationErrors.push("invalid email");
     if(password.length < 5) validationErrors.push("password must consist min 5 simbols");
 
+    if(!Validator.equals(password,passwordConf)) validationErrors.push(`pasword isn\`t match`);
 
     //note: errors list use array data structure
     if(validationErrors.length > 0)  //if any error in the list
@@ -114,7 +164,7 @@ router.post('/signup',(req,res) => {
         // note: for signuConfirmationToken field need current user id.
         // step 1: save email and passwword, and get saved user id;
         // step 2: generate and save signupConfirmationToken by user id;
-        // step 3: send signup conformation token email
+        // step 3: send signup conformation token to email
 
         userObj.save()
             .then(user=>{
@@ -141,7 +191,7 @@ router.post('/signup',(req,res) => {
 
                             emailSignupConfirmation(userConfEmail); //send signup confirmation email link
 
-                            res.json({success:true});   // Signup process OK
+                            res.json({});   // Signup process OK
                         });
 
                 });
@@ -153,6 +203,8 @@ router.post('/signup',(req,res) => {
     
 
 });
+
+
 
 
 router.post('/signup_confirmation_token',(req,res) => {
@@ -171,7 +223,7 @@ router.post('/signup_confirmation_token',(req,res) => {
 
 
         // check signupConfirmationToken saved in db, if its match env file JWT_SECRET
-        jwt.verify(user.signupConfirmationToken,process.env.JWT_SECRET,(err,decodeJWT)=>{
+        jwt.verify(user.signupConfirmationToken,process.env.JWT_SECRET,(err,decodeJWT) => {
 
             if(err)
                 return responseErrorGlobal(res,Array(`signup invalid`));
@@ -227,7 +279,7 @@ router.post('/forgot_password',(req,res) =>{
         // User OK;
         // make data updates;
         
-        user.setResetPasswordToken();   // save generated resetPasswordToken into db.
+        user.setResetPasswordToken();   // make jwtencode by user id;
 
         user.save() //save updates;
             .then((userEmail)=>{
@@ -261,7 +313,7 @@ router.post('/reset_password_token',(req,res) =>{
             if(err)
                 return responseErrorGlobal(res,Array(`reset password token invalid`));
 
-            if(user._id != decodeJWT._id)
+            if(user._id != decodeJWT._id)   // important: user id on db and jwt decoded id should be the same !!!
                 return responseErrorGlobal(res,Array(`reset password token invalid`));
 
             res.json({});   // verificaton OK;
@@ -276,7 +328,7 @@ router.post('/reset_password_token',(req,res) =>{
 router.post('/reset_password',(req,res) =>{
 
     //resetPasswordForm
-    const {password,token} = req.body.data;
+    const {password,passwordConfirm,token} = req.body.data;
 
     if(!token)
         return responseErrorGlobal(res,Array(`reset password invalid`));
@@ -286,6 +338,8 @@ router.post('/reset_password',(req,res) =>{
 
     if(password.length < 5) validationErrors.push(`password must consist min 5 simbols`);
 
+    if(!Validator.equals(password,passwordConfirm)) validationErrors.push(`pasword isn\`t match`);
+        
 
     if(validationErrors.length > 0) //if any validation error
         return responseErrorGlobal(res,validationErrors);
@@ -310,8 +364,8 @@ router.post('/reset_password',(req,res) =>{
             //JWT verification OK;
             //make user data update;
             
-            user.setPassword(password);     //add new password
-            user.resetPasswordToken="";     // make resetPasswordToken empty
+            user.setPassword(password);     //add new password bcrypted
+            user.resetPasswordToken="";     // release resetPasswordToken. Make empty;
 
             user.save() // save updates
                 .then((userEmail)=>{
@@ -319,9 +373,9 @@ router.post('/reset_password',(req,res) =>{
                     if(!userEmail)
                         return responseErrorGlobal(res,Array(`reset password invalid`));
 
-                    emailResetPasswordConfirm(userEmail);   // send confirmation email;
+                    emailResetPasswordConfirm(userEmail);   // send password confirmation success email;
 
-                    res.json({}); //send successfully done;
+                    res.json({}); //successfully reset done;
 
                 });
 

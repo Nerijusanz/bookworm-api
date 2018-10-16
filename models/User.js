@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import uuid from 'uuid/v4';
 // import uniqueValidator from 'mongoose-unique-validator';
 
 
@@ -16,6 +17,7 @@ const schema = new mongoose.Schema({
     confirmed:{type:Boolean,default:false},
     signupConfirmationToken:{type:String,default:''},
     resetPasswordToken:{type:String,default:''},
+    loginSessionId:{type:String,default:''},
 },{timestamps:true});
 
 
@@ -26,6 +28,15 @@ schema.methods.setPassword = function setPassword(inputPassword){
 schema.methods.isValidPassword = function isValidPassword(inputPassword){
     return bcrypt.compareSync(inputPassword,this.passwordHash); //return boolean
 };
+
+schema.methods.setLoginSessionId = function setLoginSessionId(){
+    this.loginSessionId = uuid();
+}
+
+schema.methods.getLoginSessionId = function getLoginSessionId(){
+    return this.loginSessionId;
+}
+
 
 
 // -------------confirmation token -------------------
@@ -55,14 +66,25 @@ schema.methods.generateResetPasswordUrl = function generateResetPasswordUrl(){
 // ------------------------------------------
 
 // ---------------JWT Generators ---------------------
-schema.methods.generateJWTUserToken = function generateJWTUserToken(){
+schema.methods.generateJWTUserLoginToken = function generateJWTUserToken(){
    
     return jwt.sign({
         id: this._id,
-        password_public:bcrypt.hashSync(this.passwordHash,10)  // take aditional bcrypt passwordHash cripting for public area
+        sess: this.loginSessionId,  // login session;
     },
      process.env.JWT_SECRET,
-     {expiresIn:"86400s"}    //3600*24  //24h
+     {expiresIn:"600s"}
+    )
+
+};
+
+schema.methods.generateJWTUserLoggedOutToken = function generateJWTUserToken(){
+   
+    return jwt.sign({
+        id: this._id,
+        sess: this.loginSessionId,  // login session;
+    },
+     process.env.JWT_SECRET,
     )
 
 };

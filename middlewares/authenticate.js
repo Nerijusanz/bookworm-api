@@ -19,10 +19,14 @@ export const authenticate = (req,res,next)=>{
     // Authorization structure: Bearer <access token>
     // split space
     const bearer = bearerHeader.split(' '); // split space gap
-    const bearerToken = bearer[1];  // token is second param
-    
-    if(!bearerToken)
+
+    if(bearer[0] !== 'Bearer')
         return responseErrorGlobal(res,Array(`Authorization forbidden`));
+
+    if(!bearer[1])
+        return responseErrorGlobal(res,Array(`Authorization forbidden`));
+
+    const bearerToken = bearer[1];  // token param
 
 
     jwt.verify(bearerToken,process.env.JWT_SECRET,(err,decodeJWT)=>{
@@ -31,7 +35,7 @@ export const authenticate = (req,res,next)=>{
             return responseErrorGlobal(res,Array(`Authorization forbidden`));
 
 
-        if(!decodeJWT.id || !decodeJWT.password_public )
+        if(!decodeJWT.id || !decodeJWT.sess )
             return responseErrorGlobal(res,Array(`Authorization forbidden`));
 
 
@@ -40,13 +44,13 @@ export const authenticate = (req,res,next)=>{
             if(!user || !user.confirmed )
                 return responseErrorGlobal(res,Array(`Authorization forbidden`));
 
-
-            if(!bcrypt.compareSync(user.passwordHash,decodeJWT.password_public))
+            if(user.loginSessionId == '' || user.loginSessionId !== decodeJWT.sess)
                 return responseErrorGlobal(res,Array(`Authorization forbidden`));
 
-
             // add cuurent user token into route
-            req.authenticatedToken = bearerToken;
+            // req.authenticatedToken = bearerToken;
+            req.authenticatedToken = user.generateJWTUserLoginToken();
+            req.authenticatedLogoutToken = user.generateJWTUserLoggedOutToken();
 
             next(); // -> OK; go to route
             
