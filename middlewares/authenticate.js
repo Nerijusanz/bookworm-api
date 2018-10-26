@@ -44,12 +44,13 @@ export const authenticate = (req,res,next)=>{
             if(!user || !user.confirmed )
                 return responseErrorGlobal(res,Array(`Authorization forbidden`));
 
+                // note: on logedout action loginSessionId is empty;
             if(user.loginSessionId == '' || user.loginSessionId !== decodeJWT.sess)
                 return responseErrorGlobal(res,Array(`Authorization forbidden`));
 
             // add cuurent user token into route
             // req.authenticatedToken = bearerToken;
-            req.authenticatedToken = user.generateJWTUserLoginToken();
+            req.authenticatedToken = user.generateJWTUserLoginToken();  // refresh token expire time
             req.authenticatedLogoutToken = user.generateJWTUserLoggedOutToken();
 
             next(); // -> OK; go to route

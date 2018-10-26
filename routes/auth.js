@@ -36,7 +36,7 @@ router.post('/login',(req,res) => {
         if(!user || !user.confirmed || !user.isValidPassword(password) )
             return responseErrorGlobal(res,Array(`Invalid credentials`));
 
-            user.setLoginSessionId();
+            user.setLoginSessionId();   // for authentication JWT
 
             user.save()
                 .then(user=>{
@@ -46,8 +46,8 @@ router.post('/login',(req,res) => {
             
                     //credentials OK;
                     res.json({user:{
-                                token:user.generateJWTUserLoginToken(),
-                                logoutToken: user.generateJWTUserLoggedOutToken(),
+                                token:user.generateJWTUserLoginToken(), // token have expire time
+                                logoutToken: user.generateJWTUserLoggedOutToken(),  // token don`t have expire time
                             }});
                             
                 })
@@ -94,7 +94,8 @@ router.post('/logout',(req,res) => {
 
 router.post('/authentication_check',authenticate,(req,res) => {
 
-    const token = req.authenticatedToken;  //get authenticatedToken from authenticate middleware
+    //get tokens from authenticate middleware
+    const token = req.authenticatedToken;  
     const logoutToken = req.authenticatedLogoutToken;
 
 

@@ -10,7 +10,7 @@ const schema = new mongoose.Schema({
         type:String,
         required:true,
         lowercase:true,
-        unique:true,    // uniqueValidator plugin
+        unique:true,    // uniqueValidator plugin if on
         index:true
     },
     passwordHash:{ type:String,required:true},
@@ -73,13 +73,13 @@ schema.methods.generateJWTUserLoginToken = function generateJWTUserToken(){
         sess: this.loginSessionId,  // login session;
     },
      process.env.JWT_SECRET,
-     {expiresIn:"600s"}
+     {expiresIn:"600s"} //600s => 10min; your choice
     )
 
 };
 
 schema.methods.generateJWTUserLoggedOutToken = function generateJWTUserToken(){
-   
+   // note: logout without expiration time
     return jwt.sign({
         id: this._id,
         sess: this.loginSessionId,  // login session;
@@ -108,7 +108,7 @@ schema.methods.generateJWTResetPasswordToken = function generateResetPasswordTok
         _id:this._id
     },
     process.env.JWT_SECRET,
-    {expiresIn:"86400s"} //3600*24 =>24h
+    {expiresIn:"3600s"} //3600 => 1h
     )
 } 
 
