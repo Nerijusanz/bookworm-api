@@ -45,11 +45,14 @@ router.post('/login',(req,res) => {
                         return responseErrorGlobal(res,Array(`login invalid`));
             
                     //credentials OK;
-                    res.json({user:{
-                                token:user.generateJWTUserLoginToken(), // token have expire time
-                                logoutToken: user.generateJWTUserLoggedOutToken(),  // token don`t have expire time
-                            }});
-                            
+
+                    const userObj = {
+                        token:user.generateJWTUserLoginToken(), // token have expire time
+                        logoutToken: user.generateJWTUserLoggedOutToken(),  // token don`t have expire time
+                    };
+
+                    res.json(userObj);
+                    
                 })
     })
 
@@ -73,10 +76,10 @@ router.post('/logout',(req,res) => {
             if(!user)
                 return responseErrorGlobal(res,Array(`logout invalid`));
 
-            if(user._id != decodeJWT.id)
+            if(user._id != decodeJWT.id || user.email != decodeJWT.email)
                 return responseErrorGlobal(res,Array(`logout invalid`));
             
-            user.loginSessionId='';
+            user.loginSessionId=''; // clean login session id
 
             user.save() // save updated data, and send email;
                 .then(()=>{
@@ -94,15 +97,15 @@ router.post('/logout',(req,res) => {
 
 router.post('/authentication_check',authenticate,(req,res) => {
 
-    //get tokens from authenticate middleware
-    const token = req.authenticatedToken;  
-    const logoutToken = req.authenticatedLogoutToken;
+    //get req.authenticatedUser from authenticate middleware
+    const userObj = req.authenticatedUser;
 
-
-    res.json({user:{
-        token,
-        logoutToken
-    }});
+    const user = {
+        token:userObj.token,
+        logoutToken: userObj.logoutToken
+    };
+    
+    res.json(user);
 
 });
 

@@ -65,12 +65,14 @@ schema.methods.generateResetPasswordUrl = function generateResetPasswordUrl(){
 
 // ------------------------------------------
 
-// ---------------JWT Generators ---------------------
+// ---------------JWT GENERATORS ---------------------
+
 schema.methods.generateJWTUserLoginToken = function generateJWTUserToken(){
    
     return jwt.sign({
         id: this._id,
-        sess: this.loginSessionId,  // login session;
+        email: this.email,
+        session: this.loginSessionId,  // login session;
     },
      process.env.JWT_SECRET,
      {expiresIn:"600s"} //600s => 10min; your choice
@@ -82,6 +84,7 @@ schema.methods.generateJWTUserLoggedOutToken = function generateJWTUserToken(){
    // note: logout without expiration time
     return jwt.sign({
         id: this._id,
+        email: this.email,
         sess: this.loginSessionId,  // login session;
     },
      process.env.JWT_SECRET,
