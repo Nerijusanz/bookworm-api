@@ -7,7 +7,7 @@ import Promise from 'bluebird';//overwrite default mongoose promise into bluebir
 
 import auth from './routes/auth';
 import dashboard from './routes/dashboard';
-import books from './routes/books';
+import book from './routes/book';
 
 dotenv.config();    //INITIALIZE .env PARAMS
 
@@ -27,7 +27,7 @@ mongoose.set('useCreateIndex', true);
 // ----------------Routers------------------
 app.use('/api/auth',auth);
 app.use('/api/dashboard',dashboard);
-app.use('/api/books',books);
+app.use('/api/books',book);
 // -----------------------------------------
 
 
