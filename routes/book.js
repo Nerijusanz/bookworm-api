@@ -15,6 +15,9 @@ router.get('/',authenticate,(req,res) => {
 
 router.get('/search',authenticate,(req,res) => {
 
+    // make database search, or api serach
+
+    //simulation data
     const data={
         books:[
             {
@@ -23,7 +26,7 @@ router.get('/search',authenticate,(req,res) => {
                 author:"Lisa Sabin-Wilson",
                 covers:[
                     'https://images.gr-assets.com/books/1179261815l/894766.jpg',
-
+                    'https://images.gr-assets.com/books/1348477206l/10282865.jpg'
                 ],
                 pages:384
             },
@@ -33,7 +36,7 @@ router.get('/search',authenticate,(req,res) => {
                 author:"Brad Williams Ozh Richard, Justin Tadlock",
                 covers:[
                     'https://images.gr-assets.com/books/1348477206l/10282865.jpg',
-                    'https://images.gr-assets.com/books/1348477206l/10282865.jpg'
+                    'https://images.gr-assets.com/books/1179261815l/894766.jpg',
 
                 ],
                 pages:552
