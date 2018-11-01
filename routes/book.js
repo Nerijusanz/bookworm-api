@@ -5,16 +5,20 @@ import {authenticate} from '../middlewares/authenticate';
 
 const router = express.Router();
 
+// turn on authentication middleware all books routes
+router.use(authenticate);
 
-router.get('/',authenticate,(req,res) => {
+
+router.get('/',(req,res) => {
 
     res.json({});
 
 });
 
 
-router.get('/search',authenticate,(req,res) => {
+router.get('/search',(req,res) => {
 
+    const query = req.query.q;  //search?q= 
     // make database search, or api serach
 
     //simulation data
