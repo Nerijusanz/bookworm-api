@@ -48,10 +48,12 @@ export const authenticate = (req,res,next)=>{
 
             
             const userObj={
+                id:user._id,
                 token:user.generateJWTUserLoginToken(),
                 logoutToken: user.generateJWTUserLoggedOutToken(),
             };
 
+            
             req.authenticatedUser = userObj; // append data to route
 
             next(); // -> authentication done OK; go to route
