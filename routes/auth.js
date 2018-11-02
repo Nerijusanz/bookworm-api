@@ -3,8 +3,6 @@ import User from '../models/User';
 import jwt from 'jsonwebtoken';
 import Validator from 'validator';
 
-const router = express.Router();
-
 import {authenticate} from '../middlewares/authenticate';
 
 import {responseErrorGlobal,responseErrorEmail} from '../utils/errors';
@@ -14,6 +12,8 @@ import {emailForgotPassword} from '../mail/auth/emailForgotPassword';
 
 import {emailSignupConfirmation} from '../mail/auth/emailSignupConfirmation';
 import {emailSignupUserConfirm} from '../mail/auth/emailSignupUserConfirm';
+
+const router = express.Router();
 
 
 router.post('/login',(req,res) => {
