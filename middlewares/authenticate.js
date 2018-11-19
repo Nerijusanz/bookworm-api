@@ -26,7 +26,7 @@ export const authenticate = (req,res,next)=>{
 
     if(bearer[0] !== 'Bearer')  return responseError(res);
 
-    if(!bearer[1])  return responseError(res);
+    if(!bearer[1] || bearer[1] === 'undefined')  return responseError(res);
 
     const bearerToken = bearer[1];  // token param
 
