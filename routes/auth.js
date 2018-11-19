@@ -63,7 +63,7 @@ router.post('/logout',(req,res) => {
 
     const logoutToken = req.body.logoutToken;  // logout token
 
-    if(!logoutToken)
+    if(!logoutToken || logoutToken === 'undefined')
         return responseErrorGlobal(res,Array(`logout invalid`));
 
     jwt.verify(logoutToken,process.env.JWT_SECRET,(err,decodeJWT) => {
