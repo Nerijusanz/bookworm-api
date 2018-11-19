@@ -4,7 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon --exec babel-node -- ./index.js"
+    "start": "nodemon --exec babel-node -- ./index.js",
+    "server": "npm run start",
+    "client": "cd ../bookworm-react && npm run start",
+    "dev": "npm run server & npm run client"
   },
   "author": "",
   "license": "ISC",
