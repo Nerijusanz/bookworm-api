@@ -18,11 +18,12 @@ const schema = new mongoose.Schema({
     signupConfirmationToken:{type:String,default:''},
     resetPasswordToken:{type:String,default:''},
     loginSessionId:{type:String,default:''},
-},{timestamps:true});
+},{timestamps:true});   //record createdAt, updatedAT timestamp
 
 
 schema.methods.setPassword = function setPassword(inputPassword){
-    this.passwordHash = bcrypt.hashSync(inputPassword,10);
+    
+    this.passwordHash = bcrypt.hashSync(inputPassword,10);  //default bcrypt salt length
 }
 
 schema.methods.isValidPassword = function isValidPassword(inputPassword){
@@ -75,13 +76,13 @@ schema.methods.generateJWTUserLoginToken = function generateJWTUserToken(){
         session: this.loginSessionId,  // login session;
     },
      process.env.JWT_SECRET,
-     {expiresIn:"600s"} //600s => 10min; your choice
+     {expiresIn:"600s"} //expire time: 600s => 10min; your choice
     )
 
 };
 
 schema.methods.generateJWTUserLoggedOutToken = function generateJWTUserToken(){
-   // note: logout without expiration time
+   // note: logout without expiration time!!
     return jwt.sign({
         id: this._id,
         email: this.email,
@@ -92,15 +93,13 @@ schema.methods.generateJWTUserLoggedOutToken = function generateJWTUserToken(){
 
 };
 
-
-
 schema.methods.generateJWTSignupConfirmationToken = function generateJWTSignupConfirmationToken(){
 
     return jwt.sign({
         _id:this._id
     },
      process.env.JWT_SECRET,
-     {expiresIn:"86400s"}    //3600*24  //24h
+     {expiresIn:"86400s"} // expiration time: 3600*24; 24h
     )
 
 };
@@ -111,7 +110,7 @@ schema.methods.generateJWTResetPasswordToken = function generateResetPasswordTok
         _id:this._id
     },
     process.env.JWT_SECRET,
-    {expiresIn:"3600s"} //3600 => 1h
+    {expiresIn:"3600s"}
     )
 } 
 
