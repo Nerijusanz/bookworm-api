@@ -1,8 +1,11 @@
 // install the following packages:
-// npm i --save-dev eslint@5.6.0 prettier babel-eslint eslint-config-airbnb@^15.0.1 eslint-config-prettier eslint-plugin-import eslint-plugin-prettier
+
+// npm i -D eslint@5.6.0 babel-eslint eslint-config-airbnb eslint-plugin-import eslint-plugin-jsx-a11y eslint-plugin-react
+
+//npm i -D prettier eslint-config-prettier eslint-plugin-prettier
 
 {
-  "extends": ["airbnb", "prettier"],
+  "extends": ["airbnb", "prettier", "prettier/react"],
   "plugins": ["prettier"],
   "parser": "babel-eslint",
   "parserOptions": {
