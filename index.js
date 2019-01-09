@@ -3,7 +3,7 @@ import path from 'path';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import bodyParser from 'body-parser';
-import Promise from 'bluebird'; // overwrite default mongoose promise into bluebird promise
+import bluebirdPromise from 'bluebird'; // overwrite default mongoose promise into bluebird promise
 
 import auth from './routes/auth';
 import dashboard from './routes/dashboard';
@@ -17,7 +17,7 @@ const app = express();
 app.use(bodyParser.json());
 
 // -------------MongoDB setups-------------
-mongoose.Promise = Promise; // overwrite default mongoose promise library into bluebird promise library
+mongoose.Promise = bluebirdPromise; // overwrite default mongoose promise library into bluebird promise library
 mongoose.connect(process.env.MONGODB_URL, { useNewUrlParser: true })
   .then(() => console.log('MongoDB Connected successfully'))
   .catch(err => console.log(err));
