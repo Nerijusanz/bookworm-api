@@ -1,3 +1,4 @@
+
 import express from 'express';
 import User from '../models/User';
 import jwt from 'jsonwebtoken';
@@ -61,9 +62,9 @@ router.post('/login',(req,res) => {
 
 router.post('/logout',(req,res) => {
 
-    const logoutToken = req.body.logoutToken;  // logout token
+    const { logoutToken } = req.body;  // logout token
 
-    if(!logoutToken || logoutToken === 'undefined')
+    if(!logoutToken || typeof logoutToken === 'undefined')
         return responseErrorGlobal(res,Array(`logout invalid`));
 
     jwt.verify(logoutToken,process.env.JWT_SECRET,(err,decodeJWT) => {
@@ -113,11 +114,11 @@ router.post('/authentication_check',authenticate,(req,res) => {
 // sigup_user_exists route use : signupform -> email field -> onBlur action, make ajax -> check if such email are in database
 router.post('/signup_email_exists',(req,res) => {
 
-    const email = req.body.email;
+    const { email } = req.body;
 
     // ------- validation start----------------------
 
-    if(!Validator.isEmail(email))
+    if( !email || typeof email === 'undefined' || !Validator.isEmail(email) )
         return responseErrorEmail(res,`Invalid email`); 
 
     // --------------- validation end-----------------
@@ -128,7 +129,6 @@ router.post('/signup_email_exists',(req,res) => {
             return responseErrorEmail(res,`email: ${email} is already taken`);      
  
         // such email don`t exists in db;
-
         res.json({});
 
     });
@@ -217,12 +217,15 @@ router.post('/signup_confirmation_token',(req,res) => {
     // front-end route page -> /signup_confirmation_token/:token" ->
     // front-end signup_confirmation_page take param :token -> call ajax to server-side;
 
-    const token = req.body.token;
+    const { token } = req.body;
+
+    if( !token || typeof token === 'undefined')
+        return responseErrorGlobal(res,Array(`signup invalid`));
 
     // find email got signupConfirmationToken in database
     User.findOne({signupConfirmationToken:token}).then(user=>{
         
-        if(!user)  // if not such user
+        if(!user || user.confirmed)  // if not such user or user account confirmed yet
             return responseErrorGlobal(res,Array(`signup invalid`));
 
 
@@ -265,7 +268,10 @@ router.post('/signup_confirmation_token',(req,res) => {
 
 router.post('/forgot_password',(req,res) =>{
     // forgotPasswordForm -> email input
-    const email = req.body.email;
+    const {email} = req.body;
+
+    if( !email || typeof email === 'undefined')
+        return responseErrorGlobal(res,Array(`forgot password invalid`));
 
     // -----------------validation start-------------
 
@@ -278,7 +284,7 @@ router.post('/forgot_password',(req,res) =>{
     User.findOne({email}).then(user=>{
 
         if(!user)
-            return responseErrorEmail(res,`email invalid. Make check your email is correct`); 
+            return responseErrorEmail(res,`invalid email`); 
 
         // User OK;
         // make data updates;
@@ -289,7 +295,7 @@ router.post('/forgot_password',(req,res) =>{
             .then((userEmail)=>{
 
                 if(!userEmail)
-                    return responseErrorGlobal(res,Array(`forgot password send invalid`));
+                    return responseErrorGlobal(res,Array(`forgot password invalid`));
 
                 emailForgotPassword(userEmail); // send email resetPasswordToken link;
 
@@ -304,7 +310,11 @@ router.post('/forgot_password',(req,res) =>{
 
 router.post('/reset_password_token',(req,res) =>{
     // resetPassword email -> reset password link clicked
-    const token = req.body.token;
+    const {token} = req.body;
+
+    if( !token || typeof token === 'undefined' )
+        return responseErrorGlobal(res,Array(`reset password token invalid`));
+
 
     User.findOne({resetPasswordToken:token}).then(user=>{
         
@@ -334,7 +344,7 @@ router.post('/reset_password',(req,res) =>{
     //resetPasswordForm
     const {password,passwordConfirm,token} = req.body.data;
 
-    if(!token)
+    if(!token || typeof token === 'undefined' )
         return responseErrorGlobal(res,Array(`reset password invalid`));
 
     // -----------------validation start-------------
