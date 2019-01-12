@@ -22,17 +22,15 @@ router.get('/search',(req,res) => {
 
     if(searchQuery == '') return res.json(data).end();
 
-    // search validation OK;
+    // TODO: search validation;
 
     const filterBooks = books.filter(book=>{
 
-        const title = book.title.toLowerCase();
+        const bookTitle = book.title.toLowerCase();
 
-        const foundStatus = title.includes( searchQuery.toLowerCase() );    // function includes() return true if founded. false if not;
+        return bookTitle.includes( searchQuery.toLowerCase() ); // return true or false
 
-        return foundStatus;
     });
-
 
     data.books = filterBooks;
     
