@@ -10,11 +10,11 @@ export const responseErrorGlobal = (res,errorsArrayList) => {
 }
 
 
-export const responseErrorEmail = (res,errorStringMsg) => {
+export const responseErrorSignupEmail = (res,errorArray) => {
 
     res.status(400)
        .json({errors:{
-                email:errorStringMsg
+                signup_email:errorArray
             }}).end();
    
 }

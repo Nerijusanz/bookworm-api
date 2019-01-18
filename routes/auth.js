@@ -6,7 +6,7 @@ import Validator from 'validator';
 
 import {authenticate} from '../middlewares/authenticate';
 
-import {responseErrorGlobal,responseErrorEmail} from '../utils/errors';
+import {responseErrorGlobal,responseErrorSignupEmail} from '../utils/errors';
 
 import {emailResetPasswordConfirm} from '../mail/auth/emailResetPasswordConfirm';
 import {emailForgotPassword} from '../mail/auth/emailForgotPassword';
@@ -119,14 +119,14 @@ router.post('/signup_email_exists',(req,res) => {
     // ------- validation start----------------------
 
     if( !email || typeof email === 'undefined' || !Validator.isEmail(email) )
-        return responseErrorEmail(res,`Invalid email`); 
+        return responseErrorSignupEmail(res,Array(`Invalid email`)); 
 
     // --------------- validation end-----------------
 
     User.findOne({email}).then(userEmail => {
 
         if(userEmail)   //if user email founded on database. 
-            return responseErrorEmail(res,`email: ${email} is already taken`);      
+            return responseErrorSignupEmail(res,Array(`email: ${email} is already taken`) );      
  
         // such email don`t exists in db;
         res.json({});
